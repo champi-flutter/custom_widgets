@@ -24,11 +24,15 @@ export "custom_widgets/containers/edit_saved_pop_scope.dart";
 
 // /overlays
 export "custom_widgets/overlays/ensured_immutable_dependency_dialog.dart";
+export 'custom_widgets/overlays/alert_dialog_template.dart';
 
 // /texts
 export "custom_widgets/texts/utilized_text.dart";
 
 // /widgets
 export "custom_widgets/widgets/loadable_widget.dart";
+
+// custom_hooks
+export 'custom_hooks/use_listenable_text_controller.dart';
 
 // todo 新しいカスタムWidgetを追加した場合、ここに記述する
