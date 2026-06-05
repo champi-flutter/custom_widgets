@@ -1,4 +1,4 @@
-library shared_components;
+library custom_widgets;
 
 // 作成したWidgetファイルをエクスポートする
 // extensions

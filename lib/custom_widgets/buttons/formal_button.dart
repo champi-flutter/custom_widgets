@@ -7,11 +7,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 /// フォーマルで堅実な高重要度ボタン。
 ///
 /// 長押しは非対応。
-
-/// Windowsのアプリケーションエラーダイアログの「OK」ボタンのような、
-/// フォーマルで堅実な高重要度ボタン。
-///
-/// 長押しは非対応。
 class FormalButton extends HookWidget {
   /// ボタンのテキスト。
   final String text;

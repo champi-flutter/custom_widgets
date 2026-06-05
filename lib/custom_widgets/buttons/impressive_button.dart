@@ -1,7 +1,9 @@
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+/// <h4>未完成</h4>
+///
 /// 重要度の高いアクションを行うボタン
 class ImpressiveButton extends StatelessWidget {
   /// ボタンの文字。
