@@ -1,11 +1,18 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// Windowsのアプリケーションエラーダイアログの「OK」ボタンのような、
 /// フォーマルで堅実な高重要度ボタン。
 ///
 /// 長押しは非対応。
-class FormalButton extends StatelessWidget {
+
+/// Windowsのアプリケーションエラーダイアログの「OK」ボタンのような、
+/// フォーマルで堅実な高重要度ボタン。
+///
+/// 長押しは非対応。
+class FormalButton extends HookWidget {
   /// ボタンのテキスト。
   final String text;
 
@@ -16,7 +23,7 @@ class FormalButton extends StatelessWidget {
   final bool isValid;
 
   /// ボタンが押されたときの処理。
-  final VoidCallback? onPressed;
+  final Future<void> Function() onPressed;
 
   /// ボタンの横幅。デフォルトは `100.w` 相当。
   final double _buttonWidth;
@@ -45,7 +52,7 @@ class FormalButton extends StatelessWidget {
   /// 枠線の太さと色の設定。
   final BorderSide borderSide;
 
-  /// 左右のパディング。
+  /// 左右の余白。
   final double sidePadding;
 
   FormalButton({
@@ -62,47 +69,67 @@ class FormalButton extends StatelessWidget {
     this.elevation = 0.5, // 控えめな立体感
     this.backgroundColor = const Color(0xFFE1E1E1),
     this.invalidColor = const Color(0xFFF0F0F0),
-    this.borderColor = const Color(0xFF0078D7),
+    this.borderColor = Colors.black38,
     this.invalidBorderColor = const Color(0xFFD3D3D3),
     Color textColor = const Color(0xFF000000),
     Color invalidTextColor = const Color(0xFF838383),
     this.sidePadding = 16.0,
-  }) : textStyle = TextStyle(
-    fontSize: fontSize ?? 14.sp,
-    fontWeight: fontWeight ?? FontWeight.normal,
-    color: isValid ? textColor : invalidTextColor,
-    fontFamily: fontFamily,
-  ),
-        _buttonWidth = buttonWidth ?? 100,
-        _buttonHeight = buttonHeight ?? 32,
+  }) :
+        _buttonWidth = buttonWidth ?? 100.w,
+        _buttonHeight = buttonHeight ?? 32.h,
         _borderRadius = borderRadius ?? BorderRadius.circular(2),
+        textStyle = TextStyle(
+        fontSize: fontSize ?? 12.5.sp,
+        fontWeight: fontWeight ?? FontWeight.normal,
+        color: isValid ? textColor : invalidTextColor,
+        fontFamily: fontFamily,
+      ),
         borderSide = BorderSide(
           color: isValid
-              ? (borderColor ?? const Color(0xFF0078D7))
+              ? (borderColor ?? Colors.black87)
               : (invalidBorderColor ?? const Color(0xFFD3D3D3)),
-          width: isValid ? 1.5 : 1.0, // アクティブ時は枠線を強調してフォーカスを示す
+          width: 1.0, // アクティブ時は枠線を強調してフォーカスを示す
         );
 
   @override
   Widget build(BuildContext context) {
+    // 押下状態を管理
+    final _isPressed = useState<bool>(false);
+
+    final _isOnProcess = useState<bool>(false);
+
+    final isPressDown = _isPressed.value || _isOnProcess.value;
 
     // 形の設定（シャープな角と明瞭なボーダー）
     final BoxDecoration decoration = BoxDecoration(
       borderRadius: _borderRadius,
       border: Border.fromBorderSide(borderSide),
       color: isValid ? backgroundColor : invalidColor,
-      boxShadow: (elevation > 0 && isValid)
-          ? [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.1),
-          blurRadius: elevation * 2,
-          offset: Offset(0, elevation),
+      // ボタンの浮き具合
+      boxShadow: [
+        isPressDown
+            ? const BoxShadow(
+          color: Colors.black26,
+          spreadRadius: 0,
+          // 地面に近づくため、ぼかしをシャープにする
+          blurRadius: 0.1,
+          offset: Offset(0.1, 0.1),
+        )
+            : const BoxShadow(
+          // color: Colors.brown.shade200,
+          color: Colors.black,
+          spreadRadius: 0,
+          blurRadius: 0.5,
+          offset: Offset(1, 1),
         ),
-      ]
-          : null,
+      ],
     );
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 50),
+      transform: isPressDown && isValid
+          ? Matrix4.translationValues(0.8, 0.8, 0)
+          : Matrix4.translationValues(0, 0, 0),
       constraints: BoxConstraints(
         minWidth: _buttonWidth,
         minHeight: _buttonHeight,
@@ -117,7 +144,27 @@ class FormalButton extends StatelessWidget {
           highlightColor: Colors.black.withValues(alpha: 0.08),
           // スプラッシュエフェクトはなし
           splashColor: Colors.transparent,
-          onTap: isValid ? onPressed : null,
+          onTap: isValid ? () async {
+            // タップによる処理中は、ボタンは沈みっぱなし
+            _isOnProcess.value = true;
+            await onPressed();
+            _isOnProcess.value = false;
+          } : null,
+          // 以下3つは、押下アクション
+          onTapDown: isValid ? (_) {
+            _print("onTapDown");
+            _isPressed.value = true;
+          } : null,
+          onTapUp: isValid ? (_) async {
+            _print("onTapUp");
+            // 3秒間処理をストップ
+            await Future.delayed(const Duration(milliseconds: 50));
+            _isPressed.value = false;
+          } : null,
+          onTapCancel: isValid ? () {
+            _print("onTapCancel");
+            _isPressed.value = false;
+          } : null,
           onLongPress: (){},
           child: SizedBox(
             width: _buttonWidth,
@@ -135,5 +182,18 @@ class FormalButton extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// todo printメソッド [formal_button.dart]
+void _print(String s1, [String? s2, String? s3, String? s4, String? s5]) {
+  if (kDebugMode) {
+    print("");
+    print("[formal_button.dart]　" + s1);
+    if (s2 != null) print("[formal_button.dart]　" + s2);
+    if (s3 != null) print("[formal_button.dart]　" + s3);
+    if (s4 != null) print("[formal_button.dart]　" + s4);
+    if (s5 != null) print("[formal_button.dart]　" + s5);
+    print("");
   }
 }
