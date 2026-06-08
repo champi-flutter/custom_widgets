@@ -134,7 +134,7 @@ class FormalButton extends HookWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: _borderRadius,
-          // ホバー・押下時のフィードバックをWindowsっぽく少しだけ暗くする
+          // ホバー・押下時のフィードバックを少しだけ暗くする
           hoverColor: Colors.black.withValues(alpha: 0.03),
           highlightColor: Colors.black.withValues(alpha: 0.08),
           // スプラッシュエフェクトはなし

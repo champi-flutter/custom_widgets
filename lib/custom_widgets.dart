@@ -9,7 +9,7 @@ export "extensions/navigator_extensions.dart";
 // /button
 export "custom_widgets/buttons/formal_button.dart";
 
-export "custom_widgets/buttons/full_width_button.dart";
+export "custom_widgets/buttons/flat_raised_button.dart";
 
 export "custom_widgets/buttons/impressive_button.dart";
 
