@@ -1,6 +1,6 @@
 
+import 'package:custom_widgets/src/custom_widgets/texts/utilized_text.dart';
 import 'package:flutter/material.dart';
-import 'package:custom_widgets/custom_widgets/texts/utilized_text.dart';
 
 class UtilizedText extends CustomTextUtilizer {
   const UtilizedText(
