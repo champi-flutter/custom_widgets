@@ -1,0 +1,1 @@
+enum ProcessType {sync, async}

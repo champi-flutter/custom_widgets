@@ -1,11 +1,14 @@
+import 'package:custom_widgets/custom_widgets.dart';
+import 'package:custom_widgets/custom_widgets/buttons/buttons_custom_enumerations.dart';
 import 'package:custom_widgets/custom_widgets/texts/utilized_text.dart';
 import 'package:custom_widgets/extensions/extensions_build_context.dart';
+import 'package:custom_widgets/non_export/utilized_text_non_export.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class FlatRaisedButton extends HookWidget {
-  const FlatRaisedButton({
+  const FlatRaisedButton.sync({
     super.key,
     required this.text,
     double fontSize = 25,
@@ -13,6 +16,24 @@ class FlatRaisedButton extends HookWidget {
     this.textColor,
     this.backgroundColor,
     required this.onPressedSync,
+    required this.height,
+    required this.width,
+    this.borderRadius,
+    this.borderSide,
+    required this.isValid,
+  }) : assert(onPressedSync != null, "処理の内容が設定されていません。（FlatRaisedButton.sync）"),
+       onPressedAsync = null,
+       _fontSize = fontSize,
+       _fontWeight = isBoldText ? FontWeight.bold : null,
+       processType = ProcessType.sync;
+
+  const FlatRaisedButton.async({
+    super.key,
+    required this.text,
+    double fontSize = 25,
+    bool isBoldText = false,
+    this.textColor,
+    this.backgroundColor,
     required this.onPressedAsync,
     required this.height,
     required this.width,
@@ -20,15 +41,13 @@ class FlatRaisedButton extends HookWidget {
     this.borderSide,
     required this.isValid,
   }) : assert(
-         onPressedSync != null || onPressedAsync != null,
-         "処理の内容が設定されていません。（FullWidthButton）",
+         onPressedAsync != null,
+         "処理の内容が設定されていません。（FlatRaisedButton.async）",
        ),
-       assert(
-         onPressedSync == null || onPressedAsync == null,
-         "処理の内容が重複しています。（FullWidthButton）",
-       ),
+       onPressedSync = null,
        _fontSize = fontSize,
-       _fontWeight = isBoldText ? FontWeight.bold : null;
+       _fontWeight = isBoldText ? FontWeight.bold : null,
+       processType = ProcessType.async;
 
   // isTest = false;
 
@@ -71,6 +90,8 @@ class FlatRaisedButton extends HookWidget {
 
   final bool isValid;
 
+  final ProcessType processType;
+
   // region 変更のテスト用
   // final bool isTest;
   //
@@ -105,7 +126,8 @@ class FlatRaisedButton extends HookWidget {
 
     final BorderSide _borderSide = BorderSide(style: BorderStyle.none);
 
-    final BorderRadius _borderRadius = borderRadius??BorderRadius.circular(10);
+    final BorderRadius _borderRadius =
+        borderRadius ?? BorderRadius.circular(10);
 
     // 押下状態を管理
     final _isPressed = useState<bool>(false);
@@ -170,79 +192,76 @@ class FlatRaisedButton extends HookWidget {
             ),
           ];
 
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 15.0.h, horizontal: 8.0.w),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 50),
-        // 押下時に右下方向に実際に移動させることで、3Dの押し込み感を演出
-        // transform: isPressDown && isValid
-        //     ? Matrix4.translationValues(1.4, 1.4, 0)
-        //     : Matrix4.translationValues(0, 0, 0),
-        constraints: BoxConstraints(minWidth: width, minHeight: height ?? 90.h),
-        decoration: BoxDecoration(
-          borderRadius: _borderRadius,
-          border: Border.fromBorderSide(_borderSide),
-          color: backgroundColor,
-          boxShadow: boxShadows,
-        ),
-        // クリップを適用することで、沈み込んだ時にボタン外側（右下など）にはみ出そうとする影をカット。
-        // これにより、影が「上と左のフチの内側だけ」に入り込んだように見せます。
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(
-            // ボーダーの太さ分、クリップ半径を微調整
-            (_borderRadius.topLeft.x - _borderSide.width).clamp(
-              0.0,
-              double.infinity,
-            ),
+    final Widget body = AnimatedContainer(
+      duration: const Duration(milliseconds: 50),
+      // 押下時に右下方向に実際に移動させることで、3Dの押し込み感を演出
+      // transform: isPressDown && isValid
+      //     ? Matrix4.translationValues(1.4, 1.4, 0)
+      //     : Matrix4.translationValues(0, 0, 0),
+      constraints: BoxConstraints(minWidth: width, minHeight: height ?? 90.h),
+      decoration: BoxDecoration(
+        borderRadius: _borderRadius,
+        border: Border.fromBorderSide(_borderSide),
+        color: backgroundColor,
+        boxShadow: boxShadows,
+      ),
+      // クリップを適用することで、沈み込んだ時にボタン外側（右下など）にはみ出そうとする影をカット。
+      // これにより、影が「上と左のフチの内側だけ」に入り込んだように見せます。
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(
+          // ボーダーの太さ分、クリップ半径を微調整
+          (_borderRadius.topLeft.x - _borderSide.width).clamp(
+            0.0,
+            double.infinity,
           ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: _borderRadius,
-              hoverColor: Colors.black.withValues(alpha: 0.03),
-              highlightColor: Colors.black.withValues(alpha: 0.06),
-              splashColor: Colors.transparent,
-              onTap: isValid
-                  ? () async {
-                      _isOnProcess.value = true;
-                      if (onPressedSync != null) {
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: _borderRadius,
+            hoverColor: Colors.black.withValues(alpha: 0.03),
+            highlightColor: Colors.black.withValues(alpha: 0.06),
+            splashColor: Colors.transparent,
+            onTap: isValid
+                ? () async {
+                    _isOnProcess.value = true;
+                    switch (processType) {
+                      case ProcessType.sync:
                         onPressedSync!();
-                      } else {
+                      case ProcessType.async:
                         await onPressedAsync!();
-                      }
-                      _isOnProcess.value = false;
                     }
-                  : null,
-              onTapDown: isValid
-                  ? (_) {
-                      _isPressed.value = true;
-                    }
-                  : null,
-              onTapUp: isValid
-                  ? (_) async {
-                      await Future.delayed(const Duration(milliseconds: 50));
-                      _isPressed.value = false;
-                    }
-                  : null,
-              onTapCancel: isValid
-                  ? () {
-                      _isPressed.value = false;
-                    }
-                  : null,
-              onLongPress: null,
-              child: SizedBox(
-                width: width,
-                height: height ?? 90.h,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Center(
-                    child: UtilizedText(
-                      text,
-                      fontSize: _fontSize,
-                      fontWeight: _fontWeight,
-                      color:
-                          textColor ?? Theme.of(context).colorScheme.onPrimary,
-                    ),
+                    _isOnProcess.value = false;
+                  }
+                : null,
+            onTapDown: isValid
+                ? (_) {
+                    _isPressed.value = true;
+                  }
+                : null,
+            onTapUp: isValid
+                ? (_) async {
+                    await Future.delayed(const Duration(milliseconds: 50));
+                    _isPressed.value = false;
+                  }
+                : null,
+            onTapCancel: isValid
+                ? () {
+                    _isPressed.value = false;
+                  }
+                : null,
+            onLongPress: null,
+            child: SizedBox(
+              width: width,
+              height: height,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Center(
+                  child: UtilizedText(
+                    text,
+                    fontSize: _fontSize,
+                    fontWeight: _fontWeight,
+                    color: textColor ?? Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
               ),
@@ -250,6 +269,19 @@ class FlatRaisedButton extends HookWidget {
           ),
         ),
       ),
+    );
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 15.0.h, horizontal: 8.0.w),
+      child: switch (processType) {
+        ProcessType.sync => body,
+        ProcessType.async => LoadableWidget(
+          childBorderRadius: _borderRadius,
+          // 非同期処理実行中にぐるぐるを表示する
+          isLoading: _isOnProcess.value,
+          child: body,
+        ),
+      },
     );
   }
 }

@@ -106,8 +106,8 @@ class _RenderSizeSafetyGuard extends RenderProxyBox {
   }
 }
 
-class LoadableButton extends StatelessWidget {
-  LoadableButton({
+class LoadableTemplateButton extends StatelessWidget {
+  LoadableTemplateButton({
     super.key,
     required this.text,
     this.fontSize,

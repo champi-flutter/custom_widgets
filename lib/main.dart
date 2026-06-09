@@ -183,11 +183,10 @@ class HomeScreen extends StatelessWidget {
     final List<Widget> test2 = [
       // 余白
       const SizedBox(height: 20),
-      FlatRaisedButton(
-        text: "現段階",
+      FlatRaisedButton.sync(
+        text: "FlatRaisedButton.sync",
         onPressedSync: () => _print("FullWidthButton（現段階）"),
         backgroundColor: Colors.green,
-        onPressedAsync: null,
         height: 90.h,
         width: double.infinity,
         isValid: true,
