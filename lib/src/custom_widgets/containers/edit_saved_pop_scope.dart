@@ -1,4 +1,3 @@
-
 import 'package:custom_widgets/src/extensions/navigator_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -7,30 +6,37 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 ///
 /// 対象の画面 Widget （[child]）に編集を加えた状態で pop する際に、保存されずに戻るのを
 /// ダイアログで確認して防ぐ。
-class EditSavedPopScope extends HookWidget {
-  const EditSavedPopScope({super.key, required this.child});
+class EditSavedPopScope extends StatelessWidget {
+  const EditSavedPopScope({
+    super.key,
+    required this.child,
+    required this.isEdited,
+    required this.onDiscard,
+  });
 
   final Widget child;
+
+  /// この画面で編集作業を行ったかどうか（行ったのに保存せずに戻ってしまうのを防ぐ）
+  final bool isEdited;
+
+  /// 確認ダイアログで、「破棄」を選択した場合の処理
+  final VoidCallback onDiscard;
 
   // todo build
   @override
   Widget build(BuildContext context) {
-    // この画面で編集作業を行ったかどうか（行ったのに保存せずに戻ってしまうのを防ぐ）
-    final isEdited = useState<bool>(false);
-
     return SafeArea(
       child: PopScope(
         canPop: false,
-        onPopInvokedWithResult: (
-            bool didPop,
-            result,
-            ) async {
+        onPopInvokedWithResult: (bool didPop, result) async {
           if (didPop) return;
           // 編集されていた場合は、ダイアログで確認を促す
-          if (isEdited.value) {
+          if (isEdited) {
             // ダイアログで戻ることを確認
             final bool willPop = await _willDefinitelyPop(context);
-            if(willPop && context.mounted){
+            // 「破棄」を選択した場合
+            if (willPop && context.mounted) {
+              onDiscard();
               // TextField 等にフォーカスを残さない
               Navigator.of(context).popWithUnfocus();
             }
