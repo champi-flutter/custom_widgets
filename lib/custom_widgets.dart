@@ -19,6 +19,9 @@ export "src/custom_widgets/buttons/pressable_3d_button.dart";
 
 export "src/custom_widgets/buttons/template_button.dart";
 
+// 2026/06/11 追加
+export 'src/custom_widgets/buttons/buttons_custom_enumerations.dart';
+
 // /containers
 export "src/custom_widgets/containers/edit_saved_pop_scope.dart";
 
