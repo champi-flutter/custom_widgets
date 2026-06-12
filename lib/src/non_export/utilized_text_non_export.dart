@@ -13,6 +13,7 @@ class UtilizedText extends CustomTextUtilizer {
         super.alignment = Alignment.centerLeft,
       });
 
+  /// Google Pixel 8 の横幅
   @override
-  double get designSide => 411.0; // ここでプロジェクト固有の基準サイズを指定
+  double get designSide => 411.0;
 }
