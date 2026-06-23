@@ -21,10 +21,35 @@ class SizedSimpleDialog extends StatelessWidget {
          occupancy > 0 && occupancy <= 1,
          "無効な値です（SizedSimpleDialog.occupancy）",
        ),
-      assert(
-        customActionButtons == null || onDecided == null,
-        "customActionButtons を指定する場合、onDecided を明示的に null にしてください（SizedSimpleDialog）。",
-      );
+       assert(
+         customActionButtons == null || onDecided == null,
+         "customActionButtons を指定する場合、onDecided を明示的に null にしてください（SizedSimpleDialog）。",
+       ),
+       _isBackOnly = false;
+
+  const SizedSimpleDialog.backOnly({
+    super.key,
+    this.occupancy = 0.96,
+    this.title,
+    required this.contentsList,
+    this.customActionButtons,
+    Color backButtonColor = Colors.blue,
+    Color backIconColor = Colors.white,
+  }) : assert(
+         occupancy > 0 && occupancy <= 1,
+         "無効な値です（SizedSimpleDialog.occupancy）",
+       ),
+       canDecide = true,
+       onDecided = null,
+       decisionBackgroundColor = backButtonColor,
+       invalidColor = backButtonColor,
+       decisionBorderColor = backButtonColor,
+       invalidBorderColor = backButtonColor,
+       textColorOfDecision = backIconColor,
+       invalidTextColor = backIconColor,
+       _isBackOnly = true;
+
+  final bool _isBackOnly;
 
   /// 画面上のダイアログの占有率（ 0 〜 1 ）。　デフォルトでは、`0.96`
   final double occupancy;
@@ -82,8 +107,25 @@ class SizedSimpleDialog extends StatelessWidget {
                 children: [
                   // 呼び出し元で指定する中身
                   ...contentsList,
-                  // 決定ボタン（カード追加ダイアログ）
-                  if (customActionButtons == null)
+                  // 決定ボタン
+                  // .backOnly の場合
+                  if(_isBackOnly) Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 16.w),
+                        child: FloatingActionButton(
+                          mini: true,
+                          backgroundColor: decisionBackgroundColor,
+                          onPressed: () {
+                            // TextField 等にフォーカスを残さない
+                            Navigator.of(context).popWithUnfocus();
+                          },
+                          child: Icon(Icons.clear, color: textColorOfDecision,),
+                          elevation: 2,
+                        ),
+                      ),
+                    )
+                  else if (customActionButtons == null)
                     TemplateDialogActions(
                       canDecide: canDecide,
                       onDecided: onDecided,
