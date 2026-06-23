@@ -11,6 +11,7 @@ class SizedSimpleDialog extends StatelessWidget {
     this.customActionButtons,
     this.canDecide = true,
     required this.onDecided,
+    this.onReturn,
     this.decisionBackgroundColor = Colors.blue,
     this.invalidColor = const Color(0xFFE3F2FD), // Colors.blue.shade50
     this.decisionBorderColor = const Color(0xFF1976D2), // Colors.blue.shade700
@@ -31,6 +32,7 @@ class SizedSimpleDialog extends StatelessWidget {
     super.key,
     this.occupancy = 0.96,
     this.title,
+    this.onReturn,
     required this.contentsList,
     this.customActionButtons,
     Color backButtonColor = Colors.blue,
@@ -70,6 +72,12 @@ class SizedSimpleDialog extends StatelessWidget {
 
   /// 決定ボタンを押したときの処理。
   final VoidCallback? onDecided;
+
+  /// 戻るボタンを押したときの処理。デフォルトでは、
+  /// ```
+  /// Navigator.of(context).pop();
+  /// ```
+  final VoidCallback? onReturn;
 
   /// 決定ボタンが有効な時の背景色。デフォルトでは、```Colors.blue```
   final Color decisionBackgroundColor;
@@ -129,6 +137,7 @@ class SizedSimpleDialog extends StatelessWidget {
                     TemplateDialogActions(
                       canDecide: canDecide,
                       onDecided: onDecided,
+                      onReturn: onReturn,
                     )
                   else
                     ...customActionButtons!,
