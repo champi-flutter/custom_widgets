@@ -124,7 +124,7 @@ class SizedSimpleDialog extends StatelessWidget {
                         child: FloatingActionButton(
                           mini: true,
                           backgroundColor: decisionBackgroundColor,
-                          onPressed: () {
+                          onPressed: onReturn?? () {
                             // TextField 等にフォーカスを残さない
                             Navigator.of(context).popWithUnfocus();
                           },
