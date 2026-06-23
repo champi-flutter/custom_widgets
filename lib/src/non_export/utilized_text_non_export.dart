@@ -2,6 +2,7 @@
 import 'package:custom_widgets/src/custom_widgets/texts/utilized_text.dart';
 import 'package:flutter/material.dart';
 
+/// パッケージ内部で使用する UtilizedText
 class UtilizedText extends CustomTextUtilizer {
   const UtilizedText(
       super.data, {

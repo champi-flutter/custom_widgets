@@ -25,6 +25,7 @@ export 'src/custom_widgets/buttons/buttons_custom_enumerations.dart';
 // /overlays
 export "src/custom_widgets/overlays/ensured_immutable_dependency_dialog.dart";
 export 'src/custom_widgets/overlays/alert_dialog_template.dart';
+export 'src/custom_widgets/overlays/sized_simple_dialog.dart';
 
 // /texts
 export "src/custom_widgets/texts/utilized_text.dart";
