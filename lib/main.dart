@@ -1,4 +1,3 @@
-
 import 'package:custom_widgets/src/custom_widgets/buttons/flat_raised_button.dart';
 import 'package:custom_widgets/src/custom_widgets/buttons/impressive_button.dart';
 import 'package:custom_widgets/src/custom_widgets/buttons/pressable_3d_button.dart';
@@ -6,6 +5,7 @@ import 'package:custom_widgets/src/custom_widgets/buttons/pressable_button.dart'
 import 'package:custom_widgets/src/custom_widgets/buttons/template_button.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() {
@@ -22,25 +22,27 @@ class MyApp extends StatelessWidget {
       designSize: Size(411, 914),
       minTextAdapt: false,
       splitScreenMode: true,
-      builder: (context, _) =>
-          MaterialApp(
-            title: 'Custom Widgets',
-            theme: ThemeData(
-              // todo Material3 のオンオフ
-              useMaterial3: false,
-                colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-          ),
-      home: const HomeScreen(),
-    ),);
+      builder: (context, _) => MaterialApp(
+        title: 'Custom Widgets',
+        theme: ThemeData(
+          // todo Material3 のオンオフ
+          useMaterial3: false,
+          colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        ),
+        home: HomeScreen(),
+      ),
+    );
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends HookWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final double thickness = 80;
+
+    final isBorderedAtTest3 = useState<bool>(false);
 
     final List<Widget> test1 = [
       Container(
@@ -49,10 +51,7 @@ class HomeScreen extends StatelessWidget {
         color: Colors.blue,
         alignment: Alignment.center,
         padding: EdgeInsets.symmetric(horizontal: 6),
-        child: Text("押", style: TextStyle(
-          fontSize: 21,
-          color: Colors.white,
-        ),),
+        child: Text("押", style: TextStyle(fontSize: 21, color: Colors.white)),
       ),
       // 余白
       const SizedBox(height: 20),
@@ -60,10 +59,10 @@ class HomeScreen extends StatelessWidget {
         onPressed: () {
           _print("PressableButtonが押されました。");
         },
-        child: Text("PressableButton", style: TextStyle(
-          fontSize: 21,
-          color: Colors.white,
-        ),),
+        child: Text(
+          "PressableButton",
+          style: TextStyle(fontSize: 21, color: Colors.white),
+        ),
         height: null,
         width: null,
       ),
@@ -80,17 +79,17 @@ class HomeScreen extends StatelessWidget {
           _print("ChildDeformableButtonが長押しされました。");
         },
         padding: EdgeInsets.symmetric(horizontal: 6),
-        child: Text("押", style: TextStyle(
-          fontSize: 21,
-          color: Colors.white,
-        ),),
+        child: Text("押", style: TextStyle(fontSize: 21, color: Colors.white)),
         onPressedChild: FittedBox(
           fit: BoxFit.scaleDown,
-          child: Text("押", style: TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.bold,
-            color: Colors.white70,
-          ),),
+          child: Text(
+            "押",
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+              color: Colors.white70,
+            ),
+          ),
         ),
         width: 100,
         minWidth: 20,
@@ -100,28 +99,19 @@ class HomeScreen extends StatelessWidget {
       ),
       // 余白
       const SizedBox(height: 20),
-      ElevatedButton(
-        onPressed: () {},
-        child: Text("ElevatedButton"),
-      ),
+      ElevatedButton(onPressed: () {}, child: Text("ElevatedButton")),
       // 余白
       const SizedBox(height: 20),
       Padding(
         padding: const EdgeInsets.all(18),
         child: OutlinedButton(
-          child: const Text(
-            "はい",
-            style: TextStyle(fontSize: 32),
-          ),
+          child: const Text("はい", style: TextStyle(fontSize: 32)),
           style: OutlinedButton.styleFrom(
             fixedSize: const Size(150, 75),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(35),
             ),
-            side: BorderSide(
-              color: Colors.blue.shade700,
-              width: 1.5,
-            ),
+            side: BorderSide(color: Colors.blue.shade700, width: 1.5),
             foregroundColor: Colors.white,
             backgroundColor: Colors.blue,
             padding: EdgeInsets.zero,
@@ -203,14 +193,33 @@ class HomeScreen extends StatelessWidget {
       // 余白
       const SizedBox(height: 20),
     ];
+
+    final List<Widget> test3 = [
+      TemplateDialogActions(
+        textOfDecision: "はい",
+        onDecided: () {
+          _print("TemplateDialogActions タップ");
+          isBorderedAtTest3.value = !isBorderedAtTest3.value;
+        },
+        textOfReturning: "いいえ",
+        decisionBorderColor: isBorderedAtTest3.value? Color(0xFF1976D2) : Colors.transparent,
+        returningBorderColor: isBorderedAtTest3.value? Colors.black12 : Colors.transparent,
+        returningBackgroundColor: Colors.black12,
+        borderRadius: BorderRadius.circular(10),
+        onReturn: () {
+          _print("TemplateDialogActions タップ");
+          isBorderedAtTest3.value = !isBorderedAtTest3.value;
+        },
+      ),
+    ];
     return Scaffold(
       // backgroundColor: Colors.grey.shade400,
       appBar: AppBar(),
       body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: test2,
+          children: test3,
         ),
       ),
     );
@@ -229,4 +238,3 @@ _print(String s1, [String? s2, String? s3, String? s4, String? s5]) {
     print("");
   }
 }
-

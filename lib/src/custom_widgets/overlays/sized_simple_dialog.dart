@@ -2,6 +2,8 @@ import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+enum SizedSimpleDialogStyle { basic, backOnly, confirm }
+
 class SizedSimpleDialog extends StatelessWidget {
   const SizedSimpleDialog({
     super.key,
@@ -26,7 +28,7 @@ class SizedSimpleDialog extends StatelessWidget {
          customActionButtons == null || onDecided == null,
          "customActionButtons を指定する場合、onDecided を明示的に null にしてください（SizedSimpleDialog）。",
        ),
-       _isBackOnly = false;
+       _dialogStyle = SizedSimpleDialogStyle.basic;
 
   const SizedSimpleDialog.backOnly({
     super.key,
@@ -49,9 +51,34 @@ class SizedSimpleDialog extends StatelessWidget {
        invalidBorderColor = backButtonColor,
        textColorOfDecision = backIconColor,
        invalidTextColor = backIconColor,
-       _isBackOnly = true;
+       _dialogStyle = SizedSimpleDialogStyle.backOnly;
 
-  final bool _isBackOnly;
+  const SizedSimpleDialog.confirm({
+    super.key,
+    this.occupancy = 0.96,
+    this.title,
+    required this.contentsList,
+    this.customActionButtons,
+    required this.onDecided,
+    this.onReturn,
+    this.decisionBackgroundColor = Colors.blue,
+    this.invalidColor = const Color(0xFFE3F2FD), // Colors.blue.shade50
+    this.decisionBorderColor = const Color(0xFF1976D2), // Colors.blue.shade700
+    this.invalidBorderColor = const Color(0xFF42A5F5), // Colors.blue.shade400
+    this.textColorOfDecision = Colors.white,
+    this.invalidTextColor = Colors.white,
+  }) : assert(
+         occupancy > 0 && occupancy <= 1,
+         "無効な値です（SizedSimpleDialog.occupancy）",
+       ),
+       assert(
+         customActionButtons == null || onDecided == null,
+         "customActionButtons を指定する場合、onDecided を明示的に null にしてください（SizedSimpleDialog）。",
+       ),
+       canDecide = true,
+       _dialogStyle = SizedSimpleDialogStyle.confirm;
+
+  final SizedSimpleDialogStyle _dialogStyle;
 
   /// 画面上のダイアログの占有率（ 0 〜 1 ）。　デフォルトでは、`0.96`
   final double occupancy;
@@ -117,30 +144,44 @@ class SizedSimpleDialog extends StatelessWidget {
                   ...contentsList,
                   // 決定ボタン
                   // .backOnly の場合
-                  if(_isBackOnly) Align(
+                  switch (_dialogStyle) {
+                  // 普通のコンストラクタで呼び出した時のアクションボタン
+                    SizedSimpleDialogStyle.basic => TemplateDialogActions(
+                      canDecide: canDecide,
+                      onDecided: onDecided,
+                      onReturn: onReturn,
+                    ),
+                  // SizedSimpleDialog.backOnly で呼び出した時のアクションボタン
+                    SizedSimpleDialogStyle.backOnly => Align(
                       alignment: Alignment.bottomRight,
                       child: Padding(
                         padding: EdgeInsets.only(right: 16.w),
                         child: FloatingActionButton(
                           mini: true,
                           backgroundColor: decisionBackgroundColor,
-                          onPressed: onReturn?? () {
-                            // TextField 等にフォーカスを残さない
-                            Navigator.of(context).popWithUnfocus();
-                          },
-                          child: Icon(Icons.clear, color: textColorOfDecision,),
+                          onPressed:
+                              onReturn ??
+                              () {
+                                // TextField 等にフォーカスを残さない
+                                Navigator.of(context).popWithUnfocus();
+                              },
+                          child: Icon(Icons.clear, color: textColorOfDecision),
                           elevation: 2,
                         ),
                       ),
-                    )
-                  else if (customActionButtons == null)
-                    TemplateDialogActions(
-                      canDecide: canDecide,
+                    ),
+                  // SizedSimpleDialog.confirm で呼び出した時のアクションボタン
+                    SizedSimpleDialogStyle.confirm => TemplateDialogActions(
+                      textOfDecision: "はい",
                       onDecided: onDecided,
+                      textOfReturning: "いいえ",
+                      decisionBorderColor: Colors.transparent,
+                      returningBorderColor: Colors.transparent,
+                      returningBackgroundColor: Colors.black12,
+                      borderRadius: BorderRadius.circular(10),
                       onReturn: onReturn,
-                    )
-                  else
-                    ...customActionButtons!,
+                    ),
+                  },
                 ],
               ),
             ),
@@ -150,3 +191,26 @@ class SizedSimpleDialog extends StatelessWidget {
     );
   }
 }
+
+// class _ConfirmationTextButton extends StatelessWidget {
+//   const _ConfirmationTextButton({super.key});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.end,
+//       children: [
+//         // 決定ボタン
+//         Padding(
+//           padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 16.r),
+//           child: TextButton(onPressed: , child: ),
+//         ),
+//         // 戻るボタン
+//         Padding(
+//           padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 16.r),
+//           child: ,
+//         ),
+//       ],
+//     );
+//   }
+// }
