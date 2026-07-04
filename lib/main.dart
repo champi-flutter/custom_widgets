@@ -1,8 +1,11 @@
+import 'package:custom_widgets/custom_widgets.dart';
 import 'package:custom_widgets/src/custom_widgets/buttons/flat_raised_button.dart';
 import 'package:custom_widgets/src/custom_widgets/buttons/impressive_button.dart';
+import 'package:custom_widgets/src/custom_widgets/buttons/on_off_switch.dart';
 import 'package:custom_widgets/src/custom_widgets/buttons/pressable_3d_button.dart';
 import 'package:custom_widgets/src/custom_widgets/buttons/pressable_button.dart';
 import 'package:custom_widgets/src/custom_widgets/buttons/template_button.dart';
+import 'package:custom_widgets/src/non_export/private_scaler.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -43,6 +46,12 @@ class HomeScreen extends HookWidget {
     final double thickness = 80;
 
     final isBorderedAtTest3 = useState<bool>(false);
+
+    final testSwitchState1 = useState<bool>(false);
+
+    final testSwitchState2 = useState<bool>(false);
+
+    final Color testPrimaryColor = testSwitchState1.value? Colors.green: Colors.blueAccent;
 
     final List<Widget> test1 = [
       Container(
@@ -202,8 +211,12 @@ class HomeScreen extends HookWidget {
           isBorderedAtTest3.value = !isBorderedAtTest3.value;
         },
         textOfReturning: "いいえ",
-        decisionBorderColor: isBorderedAtTest3.value? Color(0xFF1976D2) : Colors.transparent,
-        returningBorderColor: isBorderedAtTest3.value? Colors.black12 : Colors.transparent,
+        decisionBorderColor: isBorderedAtTest3.value
+            ? Color(0xFF1976D2)
+            : Colors.transparent,
+        returningBorderColor: isBorderedAtTest3.value
+            ? Colors.black12
+            : Colors.transparent,
         returningBackgroundColor: Colors.black12,
         borderRadius: BorderRadius.circular(10),
         onReturn: () {
@@ -211,13 +224,42 @@ class HomeScreen extends HookWidget {
           isBorderedAtTest3.value = !isBorderedAtTest3.value;
         },
       ),
+      OnOffSwitch.onWhite(
+        state: testSwitchState1.value,
+        primaryColor: Colors.green,
+        onChanged: (bool? newState) {
+          testSwitchState1.value = newState!;
+        },
+      ),
+      Stack(
+        children: [
+          Align(
+            alignment: AlignmentGeometry.center,
+            child: Container(
+              height: 100.pHeight(context),
+              width: 400.pWidth(context),
+              color: testPrimaryColor,
+            ),
+          ),
+          Align(
+            alignment: AlignmentGeometry.center,
+            child: OnOffSwitch.onPrimary(
+              state: testSwitchState2.value,
+              onChanged: (bool? newState) {
+                testSwitchState2.value = newState!;
+              },
+              primaryColor: testPrimaryColor,
+            ),
+          ),
+        ],
+      ),
     ];
     return Scaffold(
       // backgroundColor: Colors.grey.shade400,
       appBar: AppBar(),
       body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: test3,
         ),

@@ -17,6 +17,37 @@ extension GenericExtensions on BuildContext {
   EdgeInsets get obscuredArea => MediaQuery.paddingOf(this);
 }
 
+/// テーマカラーの呼び出しの簡略化
+extension ThemeColorReferences on BuildContext{
+
+  /// ColorSchemeに直接アクセスするためのゲッター
+  ColorScheme get colorScheme => Theme.of(this).colorScheme;
+
+  /// 主要なWidgetの背景などの色
+  Color get primaryColor => colorScheme.primary;
+
+  /// 主要なWidget内の文字、アイコンなどの色
+  Color get primaryForegroundColor => colorScheme.onPrimary;
+
+  /// ダイアログのボタン背景などの色
+  Color get secondaryColor => colorScheme.secondary;
+
+  /// ダイアログのボタン内の文字、アイコンなどの色
+  Color get secondaryForegroundColor => colorScheme.onSecondary;
+
+  /// AppBar背景などの色
+  Color get surfaceColor => colorScheme.surface;
+
+  /// TextFieldの下線、AppBarの文字などの色
+  Color get surfaceForegroundColor => colorScheme.onSurface;
+
+  /// エラー時のカラー
+  Color get errorColor => colorScheme.error;
+
+  /// エラーカラーの上に表示されるコンテンツの色
+  Color get errorForegroundColor => colorScheme.onError;
+}
+
 /// todo printメソッド [extensions_build_context.dart]
 void _print(String s1, [String? s2, String? s3, String? s4, String? s5]) {
   if (kDebugMode) {
