@@ -25,6 +25,10 @@ export 'src/custom_widgets/buttons/buttons_custom_enumerations.dart';
 // 2026/07/04 追加
 export 'src/custom_widgets/buttons/on_off_switch.dart';
 
+// 2026/08/27 追加
+export 'src/custom_widgets/buttons/tap_area_expansion.dart';
+export 'src/custom_widgets/buttons/custom_popup_menu_button.dart';
+
 // /overlays
 export "src/custom_widgets/overlays/ensured_immutable_dependency_dialog.dart";
 export 'src/custom_widgets/overlays/alert_dialog_template.dart';
