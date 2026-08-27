@@ -33,6 +33,9 @@ migrate_working_dir/
 /build/
 /coverage/
 
+#非公開 Dart ファイル
+lib/src/non_export/popup_test_controller.dart
+
 # Symbolication related
 app.*.symbols
 

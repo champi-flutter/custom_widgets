@@ -1,18 +1,27 @@
+import 'dart:io';
+
 import 'package:custom_widgets/custom_widgets.dart';
-import 'package:custom_widgets/src/custom_widgets/buttons/flat_raised_button.dart';
-import 'package:custom_widgets/src/custom_widgets/buttons/impressive_button.dart';
-import 'package:custom_widgets/src/custom_widgets/buttons/on_off_switch.dart';
-import 'package:custom_widgets/src/custom_widgets/buttons/pressable_3d_button.dart';
-import 'package:custom_widgets/src/custom_widgets/buttons/pressable_button.dart';
-import 'package:custom_widgets/src/custom_widgets/buttons/template_button.dart';
+import 'package:custom_widgets/src/custom_widgets/buttons/custom_popup_menu_button.dart';
+import 'package:custom_widgets/src/custom_widgets/widgets/relative_rect_test_wrapper.dart';
+import 'package:custom_widgets/src/non_export/popup_test_controller.dart';
 import 'package:custom_widgets/src/non_export/private_scaler.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      child: const MyApp(),
+      providers: [
+        ChangeNotifierProvider<PopupTestController>(
+          create: (_) => PopupTestController(),
+        ),
+      ],
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -32,14 +41,16 @@ class MyApp extends StatelessWidget {
           useMaterial3: false,
           colorScheme: .fromSeed(seedColor: Colors.deepPurple),
         ),
-        home: HomeScreen(),
+        home: TestScreen(),
       ),
     );
   }
 }
 
-class HomeScreen extends HookWidget {
-  const HomeScreen({super.key});
+const double appBarHeight = 80;
+
+class TestScreen extends HookWidget {
+  const TestScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +62,9 @@ class HomeScreen extends HookWidget {
 
     final testSwitchState2 = useState<bool>(false);
 
-    final Color testPrimaryColor = testSwitchState1.value? Colors.green: Colors.blueAccent;
+    final Color testPrimaryColor = testSwitchState1.value
+        ? Colors.green
+        : Colors.blueAccent;
 
     final List<Widget> test1 = [
       Container(
@@ -108,7 +121,10 @@ class HomeScreen extends HookWidget {
       ),
       // 余白
       const SizedBox(height: 20),
-      ElevatedButton(onPressed: () {}, child: Text("ElevatedButton")),
+      TextField(),
+      ElevatedButton(onPressed: () {
+        Navigator.of(context).pop();
+      }, child: Text("ElevatedButton")),
       // 余白
       const SizedBox(height: 20),
       Padding(
@@ -254,21 +270,205 @@ class HomeScreen extends HookWidget {
         ],
       ),
     ];
-    return Scaffold(
-      // backgroundColor: Colors.grey.shade400,
-      appBar: AppBar(),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: test3,
+
+    // final testRect = useState<Rect?>(null);
+    final Rect? testRect = context.select<PopupTestController, Rect?>(
+      (controller) => controller.rect,
+    );
+
+    final List<Widget> test4 = [
+      const SizedBox(height: 20),
+      PopupMenuButton(
+        child: Icon(Icons.menu),
+        itemBuilder: (context) => [
+          PopupMenuItem(child: Text("A")),
+          PopupMenuItem(child: Text("B")),
+          PopupMenuItem(child: Text("C")),
+        ],
+      ),
+      const SizedBox(height: 20),
+      PopupMenuButton(
+        child: Text("text"),
+        itemBuilder: (context) => [
+          PopupMenuItem(child: Text("A")),
+          PopupMenuItem(child: Text("B")),
+          PopupMenuItem(child: Text("C")),
+        ],
+      ),
+      const SizedBox(height: 20),
+      Text("a"),
+      const SizedBox(height: 20),
+      CustomPopupMenuButton(
+        child: Container(
+          decoration: BoxDecoration(border: Border.all()),
+          width: 400,
+          height: 100,
+        ),
+        // menuWidth: 250,
+        menuItems: [
+          PopupMenuItem(child: Text("A")),
+          PopupMenuItem(child: Text("B")),
+          PopupMenuItem(child: Text("C")),
+        ],
+      ),
+      const SizedBox(height: 20),
+      CustomPopupMenuButton(
+        viewPoint: 0.8,
+        child: Container(
+          decoration: BoxDecoration(border: Border.all()),
+          width: 200,
+          height: 100,
+        ),
+        // menuWidth: 250,
+        menuItems: [
+          PopupMenuItem(child: Text("A")),
+          PopupMenuItem(child: Text("B")),
+          PopupMenuItem(child: Text("C")),
+        ],
+      ),
+      const SizedBox(height: 20),
+      Align(
+        alignment: AlignmentGeometry.centerEnd,
+        child: CustomPopupMenuButton(
+          child: Container(
+            decoration: BoxDecoration(border: Border.all()),
+            width: 200,
+            height: 100,
+          ),
+          // menuWidth: 250,
+          menuItems: [
+            PopupMenuItem(child: Text("A")),
+            PopupMenuItem(child: Text("B")),
+            PopupMenuItem(child: Text("C")),
+          ],
+        ),
+      ),
+      const SizedBox(height: 20),
+      Align(
+        alignment: AlignmentGeometry.centerStart,
+        child: CustomPopupMenuButton(
+          child: Container(
+            decoration: BoxDecoration(border: Border.all()),
+            width: 200,
+            height: 100,
+          ),
+          // menuWidth: 250,
+          menuItems: [
+            PopupMenuItem(child: Text("A")),
+            PopupMenuItem(child: Text("B")),
+            PopupMenuItem(child: Text("C")),
+          ],
+        ),
+      ),
+      const SizedBox(height: 50),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          CustomPopupMenuButton(
+            child: Container(
+              decoration: BoxDecoration(border: Border.all()),
+              width: 200,
+              height: 100,
+            ),
+            // menuWidth: 250,
+            menuItems: [
+              PopupMenuItem(child: Text("A")),
+              PopupMenuItem(child: Text("B")),
+              PopupMenuItem(child: Text("C")),
+              PopupMenuItem(child: Text("D")),
+              PopupMenuItem(child: Text("E")),
+              PopupMenuItem(child: Text("F")),
+            ],
+          ),
+          CustomPopupMenuButton(
+            child: Container(
+              decoration: BoxDecoration(border: Border.all()),
+              width: 200,
+              height: 100,
+            ),
+            // menuWidth: 250,
+            menuItems: [
+              PopupMenuItem(child: Text("A")),
+              PopupMenuItem(child: Text("B")),
+              PopupMenuItem(child: Text("C")),
+              PopupMenuItem(child: Text("D")),
+              PopupMenuItem(child: Text("E")),
+              PopupMenuItem(child: Text("F")),
+            ],
+          ),
+        ],
+      ),
+    ];
+
+    return RelativeRectTestWrapper.toScreen(
+      rect: testRect,
+      leftSideMarker: Colors.purpleAccent,
+      screen: Scaffold(
+        // backgroundColor: Colors.grey.shade400,
+        appBar: AppBar(),
+        body: SingleChildScrollView(
+          // scrollDirection: Axis.horizontal,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: test4,
+            ),
+          ),
+          // child: Stack(
+          //   children: [
+          //     Center(
+          //       child: Column(
+          //         mainAxisAlignment: MainAxisAlignment.center,
+          //         crossAxisAlignment: CrossAxisAlignment.center,
+          //         children: test4,
+          //       ),
+          //     ),
+          //     if (testRect != null)
+          //       // Positioned.fromRect(
+          //       //   rect: testRect,
+          //       //   child: IgnorePointer(
+          //       //     child: Container(
+          //       //       // 見やすいように半透明の赤色にする
+          //       //       color: Colors.red.withValues(alpha: 0.4),
+          //       //     ),
+          //       //   ),
+          //       // ),
+          //       Positioned.fill(
+          //         child: IgnorePointer(
+          //           child: CustomPaint(
+          //             painter: TestRectPainter.quadrants(rect: testRect),
+          //             size: Size.infinite,
+          //             isComplex: false,
+          //             willChange: false,
+          //           ),
+          //         ),
+          //       ),
+          //     if (testRect != null)
+          //       Positioned.fill(
+          //         child: IgnorePointer(
+          //           child: CustomPaint(
+          //             painter: TestRectPainter.quadrants(
+          //               rect: Offset.zero & context.screenSize,
+          //               filledColor: Colors.green,
+          //               alpha: 0.1,
+          //               dashedLineColor: Colors.yellow.shade700
+          //             ),
+          //             size: Size.infinite,
+          //             isComplex: false,
+          //             willChange: false,
+          //           ),
+          //         ),
+          //       ),
+          //   ],
+          // ),
         ),
       ),
     );
   }
 }
 
-/// todo printメソッド [main.dart]
+/// printメソッド [main.dart]
 _print(String s1, [String? s2, String? s3, String? s4, String? s5]) {
   if (kDebugMode) {
     print("");
