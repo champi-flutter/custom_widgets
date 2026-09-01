@@ -42,5 +42,6 @@ export "src/custom_widgets/widgets/loadable_widget.dart";
 
 // custom_hooks
 export 'src/custom_hooks/use_listenable_text_controller.dart';
+export 'src/custom_hooks/use_non_reactive_text_controller.dart';
 
 // todo 新しいカスタムWidgetを追加した場合、ここに記述する
