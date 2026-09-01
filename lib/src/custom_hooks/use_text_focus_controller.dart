@@ -17,7 +17,7 @@ class TextFocusController {
 ///  - [onUnfocused]: このコントローラのフォーカスが外れたときの処理
 TextFocusController useTextFocusController({
   String? text,
-  required void Function(String text) onUnfocused,
+  required void Function({required String textSnapshot}) onUnfocused,
 })
 // 折りたたみ用
 {
@@ -28,7 +28,7 @@ TextFocusController useTextFocusController({
     // フォーカスの状態が変更する際に呼ばれるリスナー
     void handleFocusChange() {
       if (!focusNode.hasFocus) {
-        onUnfocused(controller.text);
+        onUnfocused(textSnapshot: controller.text);
       }
     }
 
