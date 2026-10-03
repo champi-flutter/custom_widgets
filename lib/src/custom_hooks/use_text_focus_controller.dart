@@ -15,6 +15,26 @@ class TextFocusController {
 /// フォーカス解除時に指定した処理を実行する TextField 用カスタムフック
 ///
 ///  - [onUnfocused]: このコントローラのフォーカスが外れたときの処理
+///
+/// 対象 [TextField] の `onTapOutside` を、以下のように記述すること。
+/// ```
+///    return TextField(
+///      // この領域の「外」がタップされたらフォーカスを外す
+///      onTapOutside: (event) {
+///        textFocusController.focusNode.unfocus();
+///      },
+///      controller: textFocusController.controller,
+///      style: TextStyle(fontSize: 17.0.sp),
+///      // エンターキー等で、入力完了によってフォーカスが外れるようにする
+///      onSubmitted: (_) {
+///        textFocusController.focusNode.unfocus();
+///      },
+///      // 入力欄に文字を入力したときに、編集未保存フラグを立てる。
+///      onChanged: (String value) {
+///        // ...
+///      },
+///    );
+/// ```
 TextFocusController useTextFocusController({
   String? text,
   required void Function(String textSnapshot) onUnfocused,
