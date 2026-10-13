@@ -1,6 +1,4 @@
 import 'package:custom_widgets/custom_widgets.dart';
-import 'package:custom_widgets/src/custom_widgets/buttons/buttons_custom_enumerations.dart';
-import 'package:custom_widgets/src/custom_widgets/widgets/loadable_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,6 +11,7 @@ class FlatRaisedButton extends HookWidget {
     bool isBoldText = false,
     this.textColor,
     this.backgroundColor,
+    this.invalidBackgroundColor,
     required this.onPressedSync,
     required this.height,
     required this.width,
@@ -23,7 +22,7 @@ class FlatRaisedButton extends HookWidget {
        onPressedAsync = null,
        _fontSize = fontSize,
        _fontWeight = isBoldText ? FontWeight.bold : null,
-       processType = ProcessType.sync;
+        _processType = ProcessType.sync;
 
   const FlatRaisedButton.async({
     super.key,
@@ -32,6 +31,7 @@ class FlatRaisedButton extends HookWidget {
     bool isBoldText = false,
     this.textColor,
     this.backgroundColor,
+    this.invalidBackgroundColor,
     required this.onPressedAsync,
     required this.height,
     required this.width,
@@ -45,7 +45,7 @@ class FlatRaisedButton extends HookWidget {
        onPressedSync = null,
        _fontSize = fontSize,
        _fontWeight = isBoldText ? FontWeight.bold : null,
-       processType = ProcessType.async;
+        _processType = ProcessType.async;
 
   // isTest = false;
 
@@ -63,6 +63,9 @@ class FlatRaisedButton extends HookWidget {
 
   /// ボタンの背景色。指定しない場合は、`Theme` を参照する。
   final Color? backgroundColor;
+
+  /// ボタン無効時の背景色。
+  final Color? invalidBackgroundColor;
 
   /// ボタンの高さ
   final double height;
@@ -88,7 +91,7 @@ class FlatRaisedButton extends HookWidget {
 
   final bool isValid;
 
-  final ProcessType processType;
+  final ProcessType _processType;
 
   // region 変更のテスト用
   // final bool isTest;
@@ -118,9 +121,14 @@ class FlatRaisedButton extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 背景色の指定がなかった場合は、context からテーマカラーを参照する
-    final Color _backgroundColor =
+    // isValid が true のときの背景色を決定する
+    final Color validBackgroundColor =
         backgroundColor ?? Theme.of(context).colorScheme.primary;
+
+    // isValid に応じて、実際に採用される背景色を決定する
+    final Color _backgroundColor = isValid
+        ? validBackgroundColor
+        : (invalidBackgroundColor ?? validBackgroundColor.withValues(alpha: 0.3));
 
     final BorderSide _borderSide = BorderSide(style: BorderStyle.none);
 
@@ -200,7 +208,7 @@ class FlatRaisedButton extends HookWidget {
       decoration: BoxDecoration(
         borderRadius: _borderRadius,
         border: Border.fromBorderSide(_borderSide),
-        color: backgroundColor,
+        color: _backgroundColor,
         boxShadow: boxShadows,
       ),
       // クリップを適用することで、沈み込んだ時にボタン外側（右下など）にはみ出そうとする影をカット。
@@ -223,7 +231,7 @@ class FlatRaisedButton extends HookWidget {
             onTap: isValid
                 ? () async {
                     _isOnProcess.value = true;
-                    switch (processType) {
+                    switch (_processType) {
                       case ProcessType.sync:
                         onPressedSync!();
                       case ProcessType.async:
@@ -271,7 +279,7 @@ class FlatRaisedButton extends HookWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 15.0.h, horizontal: 8.0.w),
-      child: switch (processType) {
+      child: switch (_processType) {
         ProcessType.sync => body,
         ProcessType.async => LoadableWidget(
           childBorderRadius: _borderRadius,
