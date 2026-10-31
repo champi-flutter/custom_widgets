@@ -1,3 +1,4 @@
+import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -29,10 +30,16 @@ class TemplateButton extends StatelessWidget {
   /// ボタンの文字。
   final String text;
 
-  /// ボタンの文字のスタイル [Text.style]。
-  /// [TextStyle.fontSize] のデフォルトは、```19.sp```。
-  /// [TextStyle.color] は、```isValid ? Colors.white : Colors.white ```。
-  final TextStyle textStyle;
+  // /// ボタンの文字のスタイル [Text.style]。
+  // /// [TextStyle.fontSize] のデフォルトは、```19.sp```。
+  // /// [TextStyle.color] は、```isValid ? Colors.white : Colors.white ```。
+  // final TextStyle textStyle;
+
+  final double fontSize;
+
+  final FontWeight? fontWeight;
+
+  final Color fontColor;
 
   /// ボタンが有効かどうか。
   final bool isValid;
@@ -96,8 +103,8 @@ class TemplateButton extends StatelessWidget {
     required this.text,
     required this.onPressed,
     this.onLongPress,
-    double? fontSize,
-    FontWeight? fontWeight,
+    this.fontSize = 19,
+    this.fontWeight,
     this.isValid = true,
     double? buttonWidth,
     double? buttonHeight,
@@ -110,11 +117,7 @@ class TemplateButton extends StatelessWidget {
     Color textColor = Colors.white,
     Color invalidTextColor = Colors.white,
     this.sidePadding = 8.0,
-  }) : textStyle = TextStyle(
-         fontSize: fontSize ?? 19.sp,
-         fontWeight: fontWeight,
-         color: isValid ? textColor : invalidTextColor,
-       ),
+  }) : fontColor = isValid ? textColor : invalidTextColor,
        _buttonWidth = buttonWidth ?? 90.w,
        _buttonHeight =
            buttonHeight ?? (buttonWidth != null ? buttonWidth / 2 : 45.h),
@@ -139,8 +142,8 @@ class TemplateButton extends StatelessWidget {
     required this.text,
     required this.onPressed,
     this.onLongPress,
-    double? fontSize,
-    FontWeight? fontWeight,
+    this.fontSize = 19,
+    this.fontWeight,
     this.isValid = true,
     double? buttonWidth,
     double? buttonHeight,
@@ -152,12 +155,8 @@ class TemplateButton extends StatelessWidget {
     this.invalidBorderColor = const Color(0xFF42A5F5), // Colors.blue.shade400
     Color textColor = Colors.white,
     Color invalidTextColor = Colors.white,
-    this.sidePadding = 16.0 ,
-  }) : textStyle = TextStyle(
-         fontSize: fontSize ?? 19.sp,
-         fontWeight: fontWeight,
-         color: isValid ? textColor : invalidTextColor,
-       ),
+    this.sidePadding = 16.0,
+  }) : fontColor = isValid ? textColor : invalidTextColor,
        _buttonWidth = buttonWidth ?? 90.w,
        _buttonHeight =
            buttonHeight ?? (buttonWidth != null ? buttonWidth / 2 : 45.h),
@@ -178,19 +177,34 @@ class TemplateButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ボタンの中身。通常（_flexible == false）は、後者（ボタンサイズが固定で文字がはみ
-    // 出る場合はボタンサイズが横に大きくなる）。.longText の場合（_flexible == true）は
-    // 、前者（文字サイズが固定で文字がはみ出る場合は文字を小さくする）。
+    // ボタンの中身。通常（_flexible == false）は、文字サイズが固定で文字がはみ出る場合は
+    // 文字を小さくする。.longText の場合（_flexible == true）は、ボタンサイズが可変で
+    // 文字がはみ出る場合はボタンサイズが横に大きくなる。
     final Widget _content = _flexible
-        ? Center(child: Text(text, style: textStyle, maxLines: 1))
+        ? Center(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: fontWeight,
+                color: fontColor,
+              ),
+              maxLines: 1,
+            ),
+          )
         : Center(
             child: FittedBox(
               fit: BoxFit.scaleDown,
-              child: Text(text, style: textStyle),
+              child: UtilizedText(
+                text,
+                fontSize: fontSize,
+                fontWeight: fontWeight,
+                color: fontColor,
+              ),
             ),
           );
 
-    final Widget _buttonForm= ConstrainedBox(
+    final Widget _buttonForm = ConstrainedBox(
       constraints: BoxConstraints(
         minWidth: _buttonWidth,
         minHeight: _buttonHeight,
@@ -221,10 +235,9 @@ class TemplateButton extends StatelessWidget {
       ),
     );
 
-    return _flexible ? IntrinsicWidth(child: _buttonForm):_buttonForm;
+    return _flexible ? IntrinsicWidth(child: _buttonForm) : _buttonForm;
   }
 }
-
 
 /// ダイアログのボタンのテンプレ
 class TemplateDialogActions extends StatelessWidget {
@@ -344,7 +357,7 @@ class TemplateDialogActions extends StatelessWidget {
             onPressed: onDecided,
             onLongPress: onLongPressAtDecision,
             elevation: elevation,
-            fontSize: fontSize,
+            fontSize: fontSize ?? 19,
             fontWeight: decisionFontWeight,
             isValid: canDecide,
             buttonWidth: buttonWidth,
@@ -365,7 +378,7 @@ class TemplateDialogActions extends StatelessWidget {
           child: TemplateButton(
             text: textOfReturning,
             onPressed: onReturn ?? () => Navigator.of(context).pop(),
-            fontSize: fontSize,
+            fontSize: fontSize ?? 19,
             fontWeight: returningFontWeight,
             buttonWidth: buttonWidth,
             buttonHeight: buttonHeight,

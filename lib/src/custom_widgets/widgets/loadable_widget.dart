@@ -176,7 +176,7 @@ class LoadableTemplateButton extends StatelessWidget {
       circularColor: circularColor,
       child: TemplateButton(
         text: text,
-        fontSize: fontSize,
+        fontSize: fontSize ?? 19,
         fontWeight: fontWeight,
         isValid: isValid,
         onPressed: onPressed,
