@@ -32,9 +32,9 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
-
-#非公開 Dart ファイル
-lib/src/non_export/popup_test_controller.dart
+#
+##非公開 Dart ファイル
+#lib/src/non_export/popup_test_controller.dart
 
 # Symbolication related
 app.*.symbols
